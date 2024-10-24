@@ -69,7 +69,7 @@ function App() {
   return (
     <Container>
       <Box my={5} textAlign="center">
-        <Typography variant="h2">Mint Your Rotten NFT</Typography>
+        <Typography variant="h2">It's rotten</Typography>
       </Box>
 
       {errorMessage && (
