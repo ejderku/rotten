@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import detectEthereumProvider from "@metamask/detect-provider";
 import { Container, Grid, Box, Button, Typography, CircularProgress, Alert } from "@mui/material"; // Import Material UI components
 
-const contractAddress = "0x566fb55db7FE670C4eB9994eF9776aa7Cb2B802d"; // Replace with your contract address
+const contractAddress = "0xD718B783823F421da1D7ddF4Bf6f0d437e249D80"; // Replace with your contract address
 const contractABI = [
   // Your contract ABI here
 ];
