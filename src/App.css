@@ -1,24 +1,20 @@
-.App {
-  text-align: center;
-  padding: 2rem;
+.center-gif {
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+  display: block;
 }
 
-.App-header {
-  background-color: #282c34;
-  color: white;
-  padding: 2rem;
-  border-radius: 10px;
-}
-
-button {
-  padding: 0.8rem 2rem;
+.MuiButton-root {
+  width: 100%;
   font-size: 1.2rem;
-  margin-top: 1rem;
-  border: none;
-  background-color: #61dafb;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
+  padding: 12px;
+}
+
+@media (max-width: 600px) {
+  .MuiButton-root {
+    width: 80%;
+  }
 }
 
 button:disabled {
