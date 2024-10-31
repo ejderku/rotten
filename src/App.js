@@ -2,19 +2,71 @@ import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import detectEthereumProvider from "@metamask/detect-provider";
 import { Container, Grid, Box, Button, Typography, CircularProgress, Alert } from '@mui/material';
-import './App.css';  // Add this line if you don't already have CSS imports
+import './App.css';
 
 // Contract details
-const contractAddress = "0x3a946a748E035570b856fe5D5D0b843582603dFF";  // Replace with your actual contract address
+const contractAddress = "0x3a946a748E035570b856fe5D5D0b843582603dFF";  // Update with your actual contract address
 const contractABI = [
   {
-    "inputs": [],
-    "name": "mintRandom",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_receiver",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_quantity",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_currency",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_pricePerToken",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "bytes32[]",
+            "name": "proof",
+            "type": "bytes32[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "quantityLimitPerWallet",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "pricePerToken",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "currency",
+            "type": "address"
+          }
+        ],
+        "internalType": "struct IDrop.AllowlistProof",
+        "name": "_allowlistProof",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes",
+        "name": "_data",
+        "type": "bytes"
+      }
+    ],
+    "name": "claim",
     "outputs": [],
     "stateMutability": "payable",
     "type": "function"
-  },
-  // Add other ABI functions if necessary
+  }
 ];
 
 function App() {
@@ -50,12 +102,14 @@ function App() {
       setIsMinting(true);
       setErrorMessage(""); // Clear previous error messages
 
-      const tx = await contract.mintRandom({
-        value: ethers.utils.parseEther("10"),  // 10 APE for minting
-        gasLimit: 5500000,
-        maxFeePerGas: ethers.utils.parseUnits("35", "gwei"),
-        maxPriorityFeePerGas: ethers.utils.parseUnits("3", "gwei")
-      });
+      const tx = await contract.claim(
+        account,  // Receiver's address
+        1,  // Quantity to mint
+        "0x0000000000000000000000000000000000000000", // Native currency (e.g., ETH or APE)
+        ethers.utils.parseEther("10"), // Price per token in APE
+        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: "0x0000000000000000000000000000000000000000" },  // Allowlist proof, if any
+        "0x"  // Additional data
+      );
 
       await tx.wait();
       alert("Minted successfully!");
@@ -78,12 +132,10 @@ function App() {
         </Box>
       )}
 
-      {/* GIF Section */}
       <Box display="flex" justifyContent="center" my={4}>
         <img src="/rotten.gif" alt="Rotten Banana GIF" className="center-gif" />
       </Box>
 
-      {/* Buttons Section */}
       <Grid container spacing={3} justifyContent="center">
         <Grid item xs={12} sm={6} md={3}>
           <Box textAlign="center">
