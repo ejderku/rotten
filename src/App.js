@@ -102,19 +102,27 @@ function App() {
       setIsMinting(true);
       setErrorMessage(""); // Clear previous error messages
 
+      // Setting high gas limit manually as a workaround for gas estimation errors
       const tx = await contract.claim(
         account,  // Receiver's address
         1,  // Quantity to mint
-        ethers.constants.AddressZero, // Native currency
-        ethers.utils.parseEther("10"), // Price per token in native currency (e.g., 10 APE)
-        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: ethers.constants.AddressZero },  // Allowlist proof, if any
-        "0x"  // Additional data
+        ethers.constants.AddressZero, // Native currency (e.g., ETH or APE)
+        ethers.utils.parseEther("10"), // Price per token in APE
+        { 
+          proof: [], 
+          quantityLimitPerWallet: 1, 
+          pricePerToken: ethers.utils.parseEther("10"), 
+          currency: ethers.constants.AddressZero 
+        },  // Allowlist proof, if any
+        "0x",  // Additional data
+        { gasLimit: ethers.utils.hexlify(3000000) }  // High gas limit for testing
       );
 
       await tx.wait();
       alert("Minted successfully!");
     } catch (error) {
-      setErrorMessage("Minting failed: " + error.message);
+      const revertMessage = error.error?.data?.message || error.message;
+      setErrorMessage("Minting failed: " + revertMessage);
     } finally {
       setIsMinting(false);
     }
@@ -163,8 +171,4 @@ function App() {
           </Box>
         </Grid>
       </Grid>
-    </Container>
-  );
-}
-
-export default App;
+    </Container
