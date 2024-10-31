@@ -5,7 +5,7 @@ import { Container, Grid, Box, Button, Typography, CircularProgress, Alert } fro
 import './App.css';  // Add this line if you don't already have CSS imports
 
 // Contract details
-const contractAddress = "0x8979daA79e9918B1955858dE30DEC325388F0388";  // Replace with your actual contract address
+const contractAddress = "0x3a946a748E035570b856fe5D5D0b843582603dFF";  // Replace with your actual contract address
 const contractABI = [
   {
     "inputs": [],
