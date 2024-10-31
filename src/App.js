@@ -105,9 +105,9 @@ function App() {
       const tx = await contract.claim(
         account,  // Receiver's address
         1,  // Quantity to mint
-        "0x0000000000000000000000000000000000000000", // Native currency (e.g., ETH or APE)
-        ethers.utils.parseEther("10"), // Price per token in APE
-        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: "0x0000000000000000000000000000000000000000" },  // Allowlist proof, if any
+        ethers.constants.AddressZero, // Native currency
+        ethers.utils.parseEther("10"), // Price per token in native currency (e.g., 10 APE)
+        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: ethers.constants.AddressZero },  // Allowlist proof, if any
         "0x"  // Additional data
       );
 
