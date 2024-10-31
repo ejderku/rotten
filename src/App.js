@@ -102,27 +102,34 @@ function App() {
       setIsMinting(true);
       setErrorMessage(""); // Clear previous error messages
 
-      // Setting high gas limit manually as a workaround for gas estimation errors
-      const tx = await contract.claim(
+      // Estimate gas for the claim transaction
+      const gasEstimate = await contract.estimateGas.claim(
         account,  // Receiver's address
         1,  // Quantity to mint
-        ethers.constants.AddressZero, // Native currency (e.g., ETH or APE)
+        ethers.constants.AddressZero, // Native currency (ETH or APE)
         ethers.utils.parseEther("10"), // Price per token in APE
-        { 
-          proof: [], 
-          quantityLimitPerWallet: 1, 
-          pricePerToken: ethers.utils.parseEther("10"), 
-          currency: ethers.constants.AddressZero 
-        },  // Allowlist proof, if any
-        "0x",  // Additional data
-        { gasLimit: ethers.utils.hexlify(3000000) }  // High gas limit for testing
+        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: ethers.constants.AddressZero },  // Allowlist proof, if any
+        "0x"
+      );
+
+      console.log("Estimated Gas: ", gasEstimate.toString());
+
+      // Proceed with the transaction using estimated gas
+      const tx = await contract.claim(
+        account, 
+        1, 
+        ethers.constants.AddressZero, 
+        ethers.utils.parseEther("10"), 
+        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: ethers.constants.AddressZero }, 
+        "0x",
+        { gasLimit: gasEstimate }
       );
 
       await tx.wait();
       alert("Minted successfully!");
     } catch (error) {
-      const revertMessage = error.error?.data?.message || error.message;
-      setErrorMessage("Minting failed: " + revertMessage);
+      const revertData = error?.error?.data;
+      setErrorMessage(`Minting failed: ${error.message}. Revert Data: ${JSON.stringify(revertData)}`);
     } finally {
       setIsMinting(false);
     }
@@ -171,4 +178,8 @@ function App() {
           </Box>
         </Grid>
       </Grid>
-    </Container
+    </Container>
+  );
+}
+
+export default App;
