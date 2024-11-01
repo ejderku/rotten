@@ -102,34 +102,44 @@ function App() {
       setIsMinting(true);
       setErrorMessage(""); // Clear previous error messages
 
-      // Estimate gas for the claim transaction
-      const gasEstimate = await contract.estimateGas.claim(
-        account,  // Receiver's address
-        1,  // Quantity to mint
-        ethers.constants.AddressZero, // Native currency (ETH or APE)
-        ethers.utils.parseEther("10"), // Price per token in APE
-        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: ethers.constants.AddressZero },  // Allowlist proof, if any
-        "0x"
-      );
+      // Estimate gas for the transaction
+      let gasLimit;
+      try {
+        const estimatedGas = await contract.estimateGas.claim(
+          account,
+          1,
+          "0x0000000000000000000000000000000000000000",
+          ethers.utils.parseEther("10"),
+          { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: "0x0000000000000000000000000000000000000000" },
+          "0x"
+        );
+        gasLimit = estimatedGas;
+        console.log("Estimated gas limit:", gasLimit.toString());
+      } catch (error) {
+        console.log("Gas estimation failed; using manual fallback:", error);
+        gasLimit = ethers.BigNumber.from("500000");  // Fallback gas limit (adjust as needed)
+      }
 
-      console.log("Estimated Gas: ", gasEstimate.toString());
-
-      // Proceed with the transaction using estimated gas
+      // Set transaction options with adjusted gas fees and fallback gas limit
       const tx = await contract.claim(
-        account, 
-        1, 
-        ethers.constants.AddressZero, 
-        ethers.utils.parseEther("10"), 
-        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: ethers.constants.AddressZero }, 
+        account,
+        1,
+        "0x0000000000000000000000000000000000000000",
+        ethers.utils.parseEther("10"),
+        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: "0x0000000000000000000000000000000000000000" },
         "0x",
-        { gasLimit: gasEstimate }
+        {
+          gasLimit: gasLimit,
+          maxPriorityFeePerGas: ethers.utils.parseUnits("2", "gwei"), // Adjust based on network conditions
+          maxFeePerGas: ethers.utils.parseUnits("20", "gwei") // Adjust based on network conditions
+        }
       );
 
       await tx.wait();
       alert("Minted successfully!");
     } catch (error) {
-      const revertData = error?.error?.data;
-      setErrorMessage(`Minting failed: ${error.message}. Revert Data: ${JSON.stringify(revertData)}`);
+      console.error("Minting error:", error);
+      setErrorMessage("Minting failed: " + error.message);
     } finally {
       setIsMinting(false);
     }
