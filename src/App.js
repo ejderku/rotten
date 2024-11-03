@@ -1,3 +1,4 @@
+// Full App.js with updated mintNFT function
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import detectEthereumProvider from "@metamask/detect-provider";
@@ -102,43 +103,25 @@ function App() {
       setIsMinting(true);
       setErrorMessage(""); // Clear previous error messages
 
-      // Estimate gas for the transaction
-      let gasLimit;
-      try {
-        const estimatedGas = await contract.estimateGas.claim(
-          account,
-          1,
-          "0x0000000000000000000000000000000000000000",
-          ethers.utils.parseEther("10"),
-          { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: "0x0000000000000000000000000000000000000000" },
-          "0x"
-        );
-        gasLimit = estimatedGas;
-        console.log("Estimated gas limit:", gasLimit.toString());
-      } catch (error) {
-        console.log("Gas estimation failed; using manual fallback:", error);
-        gasLimit = ethers.BigNumber.from("500000");  // Fallback gas limit (adjust as needed)
-      }
-
-      // Set transaction options with adjusted gas fees and fallback gas limit
+      // Minting transaction with specified value of 10 APE
       const tx = await contract.claim(
-        account,
-        1,
-        "0x0000000000000000000000000000000000000000",
-        ethers.utils.parseEther("10"),
-        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: "0x0000000000000000000000000000000000000000" },
-        "0x",
+        account,  // Receiver's address
+        1,  // Quantity to mint
+        "0x0000000000000000000000000000000000000000", // Native currency (e.g., ETH or APE)
+        ethers.utils.parseEther("10"), // Price per token in APE (10 APE)
+        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: "0x0000000000000000000000000000000000000000" },  // Allowlist proof, if any
+        "0x",  // Additional data
         {
-          gasLimit: gasLimit,
-          maxPriorityFeePerGas: ethers.utils.parseUnits("2", "gwei"), // Adjust based on network conditions
-          maxFeePerGas: ethers.utils.parseUnits("20", "gwei") // Adjust based on network conditions
+          value: ethers.utils.parseEther("10"), // Specify the value directly here as 10 APE
+          gasLimit: ethers.utils.hexlify(300000), // Adjust gas limit if needed
+          maxPriorityFeePerGas: ethers.utils.parseUnits("3", "gwei"),
+          maxFeePerGas: ethers.utils.parseUnits("35", "gwei")
         }
       );
 
       await tx.wait();
       alert("Minted successfully!");
     } catch (error) {
-      console.error("Minting error:", error);
       setErrorMessage("Minting failed: " + error.message);
     } finally {
       setIsMinting(false);
