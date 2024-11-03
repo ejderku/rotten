@@ -1,4 +1,3 @@
-// Full App.js with updated mintNFT function
 import React, { useState } from 'react';
 import { ethers } from 'ethers';
 import detectEthereumProvider from "@metamask/detect-provider";
@@ -10,58 +9,22 @@ const contractAddress = "0x3a946a748E035570b856fe5D5D0b843582603dFF";  // Update
 const contractABI = [
   {
     "inputs": [
-      {
-        "internalType": "address",
-        "name": "_receiver",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_quantity",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_currency",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_pricePerToken",
-        "type": "uint256"
-      },
+      { "internalType": "address", "name": "_receiver", "type": "address" },
+      { "internalType": "uint256", "name": "_quantity", "type": "uint256" },
+      { "internalType": "address", "name": "_currency", "type": "address" },
+      { "internalType": "uint256", "name": "_pricePerToken", "type": "uint256" },
       {
         "components": [
-          {
-            "internalType": "bytes32[]",
-            "name": "proof",
-            "type": "bytes32[]"
-          },
-          {
-            "internalType": "uint256",
-            "name": "quantityLimitPerWallet",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "pricePerToken",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "currency",
-            "type": "address"
-          }
+          { "internalType": "bytes32[]", "name": "proof", "type": "bytes32[]" },
+          { "internalType": "uint256", "name": "quantityLimitPerWallet", "type": "uint256" },
+          { "internalType": "uint256", "name": "pricePerToken", "type": "uint256" },
+          { "internalType": "address", "name": "currency", "type": "address" }
         ],
         "internalType": "struct IDrop.AllowlistProof",
         "name": "_allowlistProof",
         "type": "tuple"
       },
-      {
-        "internalType": "bytes",
-        "name": "_data",
-        "type": "bytes"
-      }
+      { "internalType": "bytes", "name": "_data", "type": "bytes" }
     ],
     "name": "claim",
     "outputs": [],
@@ -103,20 +66,19 @@ function App() {
       setIsMinting(true);
       setErrorMessage(""); // Clear previous error messages
 
-      // Minting transaction with specified value of 10 APE
       const tx = await contract.claim(
-        account,  // Receiver's address
-        1,  // Quantity to mint
-        "0x0000000000000000000000000000000000000000", // Native currency (e.g., ETH or APE)
-        ethers.utils.parseEther("10"), // Price per token in APE (10 APE)
-        { proof: [], quantityLimitPerWallet: 1, pricePerToken: ethers.utils.parseEther("10"), currency: "0x0000000000000000000000000000000000000000" },  // Allowlist proof, if any
-        "0x",  // Additional data
+        account,                                   // Receiver's address
+        1,                                         // Quantity to mint
+        ethers.constants.AddressZero,              // Native currency (e.g., ETH or APE)
+        ethers.utils.parseEther("10"),             // Price per token in APE
         {
-          value: ethers.utils.parseEther("10"), // Specify the value directly here as 10 APE
-          gasLimit: ethers.utils.hexlify(300000), // Adjust gas limit if needed
-          maxPriorityFeePerGas: ethers.utils.parseUnits("3", "gwei"),
-          maxFeePerGas: ethers.utils.parseUnits("35", "gwei")
-        }
+          proof: [],
+          quantityLimitPerWallet: 1,
+          pricePerToken: ethers.utils.parseEther("10"),
+          currency: ethers.constants.AddressZero
+        },                                         // Allowlist proof (empty in this example)
+        "0x",                                      // Additional data
+        { gasLimit: ethers.utils.hexlify(500000) } // Set gas limit to 500,000
       );
 
       await tx.wait();
